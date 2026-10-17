@@ -11,7 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Descompactar projeto
-        run: unzip -o FlappyCube_projeto.zip
+        run: |
+          unzip -o FlappyCube_projeto.zip -x ".github/*" "*/.github/*"
+          ls -la
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -23,10 +25,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Build APK Debug
         run: |
+          DIR=$(find . -name "gradlew" -type f -exec dirname {} \; | head -n 1)
+          echo "Pasta do projeto: $DIR"
+          cd "$DIR"
           chmod +x ./gradlew
           ./gradlew assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: flappy-cube-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: "**/build/outputs/apk/debug/*.apk"
